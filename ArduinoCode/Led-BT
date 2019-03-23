@@ -1,0 +1,63 @@
+#define led 10
+#define btIndicator 8
+
+int command;
+
+void setup() {
+
+  pinMode(led, OUTPUT);
+  pinMode(btIndicator, OUTPUT);
+  Serial.begin(9600);
+
+  digitalWrite(led, LOW);
+  digitalWrite(btIndicator, LOW);
+    
+}//setup func
+
+
+void loop() {
+
+  if(Serial.available() > 0){
+    
+    digitalWrite(btIndicator, HIGH );
+    
+    command = (int)Serial.read();
+    lightLevel(command);
+    
+  }//while loop
+  
+  digitalWrite(btIndicator, LOW);
+  
+}//loop func
+
+
+void lightLevel( int level ){
+
+  switch(level){
+
+    case 48: 
+      analogWrite(led, 0);
+      break;
+
+    case 49:
+      analogWrite(led, 25);
+      break;
+
+    case 50:
+      analogWrite(led, 75);
+      break;
+
+    case 51:
+      analogWrite(led, 150);
+      break;
+
+    default:
+      analogWrite(led, 250);
+      break;
+
+     
+  }//sw-case
+  
+  Serial.println( level );
+  
+}//lightLevel func

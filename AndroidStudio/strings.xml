@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">PID_Motor_Controller</string>
-    <string name="action_settings">Settings</string>
-    <string name="btn_Bluetooth">OFF</string>
-    <string name="toggleOff">Start</string>
-    <string name="toggleOn">Stop</string>
-</resources>

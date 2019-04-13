@@ -1,0 +1,111 @@
+
+#define ErrorPos 10
+#define ActualAngle A0
+#define Reference 2
+
+int desired = 0, desiredAngle = 90;
+int actual = 0, actualAngle = 0;
+int error = 0, errorAngle = 0;
+
+int offset = 167;
+int posDif90 = 345;
+float interval = 0.26;
+
+void setup() {
+
+  pinMode(ErrorPos, OUTPUT);
+  pinMode(Reference, OUTPUT);
+  digitalWrite(Reference, LOW);
+  
+  Serial.begin(9600);
+
+}//setup func
+
+
+void loop() {
+
+ /*
+ 
+  analogVal = (2.5 * sin(rad)) + 2.5;  
+  analogWrite(10, analogVal * 51);
+  rad += increase;
+
+  if(rad == PI || rad == 0)
+    increase *= -1;
+
+  Serial.print("Analog Value: ");
+  Serial.println(analogVal);
+
+  */
+
+  actual = analogRead(ActualAngle); 
+  actualAngle = (int)((actual - offset) * interval);
+  
+  Serial.print("Desired Angle: ");
+  Serial.print(desiredAngle);
+  
+  Serial.print("  Actual Angle: ");
+  Serial.print(actualAngle);
+
+    Serial.print("  Error Angle: ");
+  Serial.print(errorAngle);
+  
+  Serial.println("");
+
+/*
+  if(Serial.available() > 0){
+
+    desired = (int)Serial.read();
+
+  }//bluetooth block
+
+  
+  if(desired == 48)
+    desiredAngle = 0;
+
+  if(desired == 49)
+    desiredAngle = 90;
+
+  if(desired = 50)
+    desiredAngle = 180;
+*/
+  actualWriter(desiredAngle, actualAngle);
+
+    
+}//loop func
+
+
+void actualWriter( int desiredAngle, int actualAngle){
+
+   errorAngle = desiredAngle - actualAngle;
+  
+   if(errorAngle >= 0){
+
+      digitalWrite(Reference, LOW);
+
+      if(errorAngle < 90){
+
+         analogWrite(ErrorPos, errorAngle * 2.83 );
+        
+      }else{
+        
+        analogWrite(ErrorPos, 255);
+          
+      }//pos
+   }else{
+
+    digitalWrite(Reference, HIGH);
+
+    if(errorAngle > -90){
+
+        analogWrite(ErrorPos, 255-(-errorAngle) * 2.83 );
+      
+      }else{
+        
+        analogWrite(ErrorPos, 0);  
+        
+      }//neg
+    
+   }//ErrorWrite
+  
+}//actualWriter

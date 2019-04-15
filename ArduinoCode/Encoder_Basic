@@ -1,0 +1,54 @@
+  
+ //http://www.bilgiinegi.com/arduino-ile-ky-040-rotary-encoder-nasil-kullanilir.htm
+  
+ // Encoder Switch -> pin 10
+ // Encoder Output A -> pin 9
+ // Encoder Output B -> pin 8
+
+ 
+int Encoder_OuputA  = 9;
+int Encoder_OuputB  = 8;
+int Encoder_Switch = 10;
+ 
+int Previous_Output;
+int Encoder_Count;
+ 
+ 
+void setup() {
+
+ 
+  pinMode (Encoder_OuputA, INPUT);
+  pinMode (Encoder_OuputB, INPUT);
+  pinMode (Encoder_Switch, INPUT);
+
+  Serial.begin(9600);
+ 
+  Previous_Output = digitalRead(Encoder_OuputA); 
+}
+ 
+void loop() {
+   //aVal = digitalRead(pinA);
+   
+   if (digitalRead(Encoder_OuputA) != Previous_Output)
+   { 
+     if (digitalRead(Encoder_OuputB) != Previous_Output) 
+     { 
+       Encoder_Count ++; 
+       Serial.print("Saat Yonu: ");
+       Serial.println(Encoder_Count);
+     } 
+     else 
+     {
+       Encoder_Count--;
+       Serial.print("Saat Yonu Tersi: ");
+       Serial.println(Encoder_Count); 
+     }
+   }
+ 
+   Previous_Output = digitalRead(Encoder_OuputA);
+ 
+   if (digitalRead(Encoder_Switch) == 0)
+   {
+     Serial.println("Anahtar Basilmis");
+   }
+}

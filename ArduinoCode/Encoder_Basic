@@ -2,8 +2,8 @@
  //http://www.bilgiinegi.com/arduino-ile-ky-040-rotary-encoder-nasil-kullanilir.htm
   
  // Encoder Switch -> pin 10
- // Encoder Output A -> pin 9
- // Encoder Output B -> pin 8
+ // Encoder Output A -> pin 9   Data
+ // Encoder Output B -> pin 8   Clock
 
  
 int Encoder_OuputA  = 9;

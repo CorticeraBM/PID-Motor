@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BluetoothAdaptor Example</string>
+    <string name="BlueEx">Bluetooth Example</string>
+    <string name="tutorials_point">Tutorials Point</string>
+    <string name="paired_devices">Paired Devices:</string>
+    <string name="imageText">TODO</string>
+    <string name="turn_on">Turn On</string>
+    <string name="get_visible">Get Visible</string>
+    <string name="list_devices">List Devices</string>
+    <string name="turn_off">Turn Off</string>
+</resources>

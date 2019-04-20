@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
 
-
     // #defines for identifying shared types between calling functions
     private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
@@ -78,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
         mDevicesListView.setOnItemClickListener(mDeviceClickListener);
 
 
-
-
         mHandler = new Handler(){
             public void handleMessage(android.os.Message msg){
                 if(msg.what == MESSAGE_READ){
@@ -89,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
+
+                    //manu start
+
+
+
+
+                    //manu finish
                     mReadBuffer.setText(readMessage);
                 }
 
@@ -120,8 +124,53 @@ public class MainActivity extends AppCompatActivity {
             mScanBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     bluetoothOn(v);
+
+                    final String address = "00:18:E4:35:65:5E";
+                    final String name = "HC-06";
+
+                    // Spawn a new thread to avoid blocking the GUI one
+                    new Thread()
+                    {
+                        public void run() {
+                            boolean fail = false;
+
+                            BluetoothDevice device = mBTAdapter.getRemoteDevice(address);
+
+                            try {
+                                mBTSocket = createBluetoothSocket(device);
+                            } catch (IOException e) {
+                                fail = true;
+                                Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
+                            }
+                            // Establish the Bluetooth socket connection.
+                            try {
+                                mBTSocket.connect();
+                            } catch (IOException e) {
+                                try {
+                                    fail = true;
+                                    mBTSocket.close();
+                                    mHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
+                                            .sendToTarget();
+                                } catch (IOException e2) {
+                                    //insert code to deal with this
+                                    Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            if(fail == false) {
+                                mConnectedThread = new ConnectedThread(mBTSocket);
+                                mConnectedThread.start();
+
+                                mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name)
+                                        .sendToTarget();
+                            }
+                        }
+                    }.start();
+
+
                 }
+
             });
 
             mOffBtn.setOnClickListener(new View.OnClickListener(){
@@ -158,6 +207,11 @@ public class MainActivity extends AppCompatActivity {
         else{
             Toast.makeText(getApplicationContext(),"Bluetooth is already on", Toast.LENGTH_SHORT).show();
         }
+
+        while(!mBTAdapter.isEnabled()){
+            //
+        }
+
     }
 
     // Enter here after user selects "yes" or "no" to enabling radio
@@ -238,8 +292,8 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothStatus.setText("Connecting...");
             // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();
-            final String address = info.substring(info.length() - 17);
-            final String name = info.substring(0,info.length() - 17);
+            final String address = "00:18:E4:35:65:5E";
+            final String name = "HC-06";
 
             // Spawn a new thread to avoid blocking the GUI one
             new Thread()

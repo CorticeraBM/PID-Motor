@@ -1,3 +1,5 @@
+http://mcuhq.com/27/simple-android-bluetooth-application-with-arduino-example
+
 package com.example.sairamkrishna.pidmotorposition;
 
 import android.bluetooth.BluetoothAdapter;

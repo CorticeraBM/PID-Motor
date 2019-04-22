@@ -1,4 +1,6 @@
 #define ActualAngle A0
+#define MOD 10
+#define AVE 10
 
 int actual = 0, actualAngle = 0;
 int i,p,q,counter = 0, compare, maxer;
@@ -19,9 +21,9 @@ void setup() {
 
 void loop() {
   
-  int data[25];
-  int stack[25];
-  for(i = 0; i < 25; i++){
+  int data[MOD];
+  int stack[MOD];
+  for(i = 0; i < MOD; i++){
       stack[i] = 0;
       data[i] = 0;
   }
@@ -29,12 +31,12 @@ void loop() {
   actualAverage = 0;
 
   
-  for( q = 0; q < 20; q++ ){
+  for( q = 0; q < AVE; q++ ){
     
     counter = 0;
     compare = 0;
     maxer = 0;
-    for(i = 0; i < 25; i++){
+    for(i = 0; i < MOD; i++){
       
       actual = analogRead(ActualAngle); 
       actualAngle = (int)((actual - offset) * interval);    
@@ -67,7 +69,7 @@ void loop() {
     
   }//inclusive loop
 
-  actualAngle = actualAverage * 0.05;
+  actualAngle = actualAverage / AVE;
 
   if(dataStack != actualAngle)
    Serial.println(actualAngle);

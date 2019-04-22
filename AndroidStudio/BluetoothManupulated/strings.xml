@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PID Motor Position</string>
+    <string name="connect_arduino">Connect Arduino</string>
+    <string name="actual_angle">Actual Angle:</string>
+    <string name="no_input">No Input</string>
+    <string name="textview">No Connection</string>
+    <string name="bluetooth_status">BT Status:</string>
+</resources>

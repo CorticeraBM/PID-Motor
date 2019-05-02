@@ -87,6 +87,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+        
+        DecoView arcView = (DecoView)findViewById(R.id.dynamicArcView);
+        int x;
+        // Create background
+        arcView.addSeries(new SeriesItem.Builder(Color.argb(155, 218, 218, 218))
+                .setRange(0, 100, 100)
+                .setInitialVisibility(false)
+                .setLineWidth(32f)
+                .build());
+
+        //Create angle data series
+        SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(255, 35, 60, 218))
+                .setRange(0, 360, 0)
+                .setSeriesLabel(new SeriesLabel.Builder("%.0f Angle")
+                        .setColorBack(Color.argb(218, 0, 0, 0))
+                        .setColorText(Color.argb(255, 255, 255, 255))
+                        .build())
+                .setLineWidth(32f)
+                .build();
+
+        int series1Index = arcView.addSeries(seriesItem1);
+
+        arcView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
+                .setDelay(1000)
+                .setDuration(2000)
+                .build());
+        x=90;
+        x = x % 360;
+        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(2000).build()); //90 
+        x= (x + 90) % 360;
+        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(4000).build()); //180
+        x= (x + 180) % 360;
+        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(6000).build()); //360-0
 
         if (mBTArrayAdapter == null) {
             // Device does not support Bluetooth

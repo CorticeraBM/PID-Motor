@@ -53,4 +53,12 @@
         android:text="@string/textview"
         app:layout_constraintStart_toEndOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/scan" />
+    
+    <com.hookedonplay.decoviewlib.DecoView
+        android:id="@+id/dynamicArcView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="84dp"
+        app:layout_constraintStart_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 </android.support.constraint.ConstraintLayout>

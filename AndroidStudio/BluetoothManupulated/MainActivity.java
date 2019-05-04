@@ -14,14 +14,18 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.hookedonplay.decoviewlib.DecoView;
+import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.charts.SeriesLabel;
+import com.hookedonplay.decoviewlib.events.DecoEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,11 +34,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.UUID;
 
+
 public class MainActivity extends AppCompatActivity {
 
     // GUI Components
     private TextView mBluetoothStatus;
     private TextView mReadBuffer;
+    private TextView mActualAngle;
     private Button mScanBtn;
     private BluetoothAdapter mBTAdapter;
     private ArrayAdapter<String> mBTArrayAdapter;
@@ -42,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     private Handler mHandler; // Our main handler that will receive callback notifications
     private ConnectedThread mConnectedThread; // bluetooth background worker thread to send and receive data
     private BluetoothSocket mBTSocket = null; // bi-directional client-to-client data path
-
+    private int actual = 0;
+    private int temp = 0, i = 0;
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
 
     // #defines for identifying shared types between calling functions
@@ -64,18 +71,37 @@ public class MainActivity extends AppCompatActivity {
         mBTArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         mBTAdapter = BluetoothAdapter.getDefaultAdapter(); // get a handle on the bluetooth radio
 
+        DecoView arcView = (DecoView)findViewById(R.id.dynamicArcView);
+        // Create background track
+        arcView.addSeries(new SeriesItem.Builder(Color.argb(155, 218, 218, 218))
+                .setRange(0, 100, 100)
+                .setInitialVisibility(false)
+                .setLineWidth(32f)
+                .build());
 
         mHandler = new Handler(){
             public void handleMessage(android.os.Message msg){
                 if(msg.what == MESSAGE_READ){
                     String readMessage = null;
                     try {
+                        /*
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
+                        mReadBuffer.setText(readMessage);
+                        //funcOfCorti(readMessage);
+*/
+
+                        byte[] sg = (byte[])msg.obj;
+                        String s = new String(sg,"UTF-8");
+                        String ss = s.substring(0,s.indexOf("\n")).trim();
+                        mReadBuffer.setText(ss);
+                        funcOfCorti(ss);
+
+
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    mReadBuffer.setText(readMessage);
+
 
                 }
 
@@ -87,39 +113,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        
-        DecoView arcView = (DecoView)findViewById(R.id.dynamicArcView);
-        int x;
-        // Create background
-        arcView.addSeries(new SeriesItem.Builder(Color.argb(155, 218, 218, 218))
-                .setRange(0, 100, 100)
-                .setInitialVisibility(false)
-                .setLineWidth(32f)
-                .build());
-
-        //Create angle data series
-        SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(255, 35, 60, 218))
-                .setRange(0, 360, 0)
-                .setSeriesLabel(new SeriesLabel.Builder("%.0f Angle")
-                        .setColorBack(Color.argb(218, 0, 0, 0))
-                        .setColorText(Color.argb(255, 255, 255, 255))
-                        .build())
-                .setLineWidth(32f)
-                .build();
-
-        int series1Index = arcView.addSeries(seriesItem1);
-
-        arcView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
-                .setDelay(1000)
-                .setDuration(2000)
-                .build());
-        x=90;
-        x = x % 360;
-        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(2000).build()); //90 
-        x= (x + 90) % 360;
-        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(4000).build()); //180
-        x= (x + 180) % 360;
-        arcView.addEvent(new DecoEvent.Builder(x).setIndex(series1Index).setDelay(6000).build()); //360-0
 
         if (mBTArrayAdapter == null) {
             // Device does not support Bluetooth
@@ -187,13 +180,64 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     }.start();
-
-
                 }
-
             });
+        }
+    }
+
+    private synchronized void funcOfCorti(String actualS)throws  Exception{
+
+        actual=Integer.valueOf(actualS);
+      /*  char[] actualC = actualS.toCharArray();
+
+        actual = 0;
+        for(i = 0; i < actualC.length - 1; i++) {
+
+            actual *= 10;
+            actual += (int) (actualC[i]) - 48;
+
+        }*/
+
+
+        DecoView arcView = (DecoView)findViewById(R.id.dynamicArcView);
+
+        //Create data series track
+        SeriesItem seriesItem1 = new SeriesItem.Builder(Color.argb(255, 35, 60, 218))
+                .setRange(0, 360, temp%360)
+                .setSeriesLabel(new SeriesLabel.Builder("%.0f Angle")
+                        .setColorBack(Color.argb(218, 0, 0, 0))
+                        .setColorText(Color.argb(255, 255, 255, 255))
+                        .build())
+                .setLineWidth(32f)
+                .build();
+
+        int series1Index = arcView.addSeries(seriesItem1);
+
+        arcView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
+                .setDuration(5000)
+                .build());
+        arcView.addEvent(new DecoEvent.Builder(actual).setIndex(series1Index).build());
+
+        mActualAngle = (TextView) findViewById(R.id.actualAngle);
+        mActualAngle.setText(String.valueOf(actual));
+
+       /* if(actual>360){
+            SeriesItem seriesItem2 = new SeriesItem.Builder(Color.argb(255, 35, 215, 30))
+                    .setRange(0, 360, temp%360)
+                    .setLineWidth(20f)
+                    .build();
+            int series2Index = arcView.addSeries(seriesItem2);
+
+            arcView.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
+                    .setDuration(5000)
+                    .build());
+            actual= actual % 360;
+            arcView.addEvent(new DecoEvent.Builder(actual).setIndex(series2Index).build());
 
         }
+
+
+*/      temp = actual;
     }
 
     private boolean bluetoothOn(View view){
@@ -346,6 +390,7 @@ public class MainActivity extends AppCompatActivity {
                         mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                                 .sendToTarget(); // Send the obtained bytes to the UI activity
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
 
